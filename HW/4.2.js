@@ -11,8 +11,7 @@ class ImmutableCircle {
     }
 
     moveTo(_x, _y) {
-        this.center.x = _x;
-        this.center.y = _y;
+        return new ImmutableCircle(center.moveTo(_x, _y), this.radius);
     }
 
     toString() {
@@ -35,8 +34,7 @@ class ImmutablePoint {
     }
 
     moveTo(_x, _y) {
-        this.x = _x
-        this.y = _y
+        return new ImmutablePoint(_x, _y);
     }
 
     toString() { return 'x: ' + this.x + ' y: ' + this.y }
@@ -45,8 +43,9 @@ class ImmutablePoint {
 
 let pp = new ImmutablePoint(100, 100);
 console.log(pp.toString());
-pp.moveTo(10, 10);
+let pp1 = pp.moveTo(10, 10);
 console.log(pp.toString());
+console.log(pp1.toString());
 
 
 // testing

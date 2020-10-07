@@ -1,23 +1,23 @@
 function TextValue() {
     let textValue = {};
 
-    textValue.value = () => {return 'This is a TextValue'};
+    textValue.value = () => { return 'This is a TextValue' };
 }
 
 function NumericValue() {
     let numericValue = {};
 
-    numericValue.value = () => {return 1};
+    numericValue.value = () => { return 1 };
 
-    numericValue.unit = () => {return 'This is a Unit'};
+    numericValue.unit = () => { return 'This is a Unit' };
 }
 
 function Data() {
     let data = {};
 
-    data.type = () => { return 'This is DataType'};
-    data.time = () => { return 'This is DateTime'};
-    data.place = () => { return 'This is DataPlace'};
+    data.type = () => { return 'This is DataType' };
+    data.time = () => { return 'This is DateTime' };
+    data.place = () => { return 'This is DataPlace' };
 }
 
 function Temperature() {
@@ -26,12 +26,12 @@ function Temperature() {
 
     // (0°C × 9/5) + 32 = 32°F
     temperature.convertToF = (celsius) => {
-        temperatureFahrenheit = (celsius * (9/5)) + 32;
+        temperatureFahrenheit = (celsius * (9 / 5)) + 32;
     };
-    
+
     // (32°F − 32) × 5/9 = 0°C
     temperature.convertToC = (fahrenheit) => {
-        temperatureCelsius = (fahrenheit - 32) * (5/9);
+        temperatureCelsius = (fahrenheit - 32) * (5 / 9);
     };
 }
 
