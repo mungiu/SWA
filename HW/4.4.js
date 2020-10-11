@@ -18,12 +18,12 @@ class ImmutableData {
     constructor(_type, _time, _place) {
         this.type = _type;
         this.time = _time;
-        this.palce = _place;
+        this.place = _place;
     }
 
     getType() { return this.type }
     getTime() { return this.time }
-    getPlace() { return this.palce }
+    getPlace() { return this.place }
 }
 
 class ImmutableTemperature {

@@ -1,8 +1,8 @@
 function WeatherEvent(place) {
-    const event = { timeECMA: new Date().toLocaleDateString(), place };
+    const event = { time: new Date().toLocaleDateString(), place };
 
     event.getTime = () => {
-        return event.timeECMA;
+        return event.time;
     };
 
     event.getPlace = () => {
