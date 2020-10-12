@@ -16,5 +16,7 @@ const reduce = function (iterable, reduceFn, accumulator) {
 const map1 = (a, f) => reduce(a, (arr, v) => [...arr, f(v)], [])
 const filter1 = (a, p) => reduce(a, (arr, v) => p(v) ? [...arr, p(v)] : arr, [])
 
-console.log(map1(personsSalaries, (v) => v.salary)) // extracting all salaries
-console.log(filter1(personsSalaries, (v) => (v.age >= 2) ? v.salary : null)) // extracting all salaries of people with age above 2
+// extracting all salaries
+console.log(map1(personsSalaries, (v) => v.salary)) 
+// extracting all salaries of people with age above 2
+console.log(filter1(personsSalaries, (v) => (v.age >= 2) ? v.salary : null)) 
