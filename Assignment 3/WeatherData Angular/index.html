@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- ng-app determines that this is an application for angular-->
+<html ng-app="weatherApp">
+
+<head>
+    <title>
+        Weather Data App
+    </title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.js"></script>
+    <!-- Importing weatherHistoryController-->
+    <script src="weatherHistory.js"></script>
+</head>
+
+<!-- The ng-controller directive allows us to choose a controller and instantiate is 
+using the keyword "as"
+NOTE: controllers can be generally considered as classes-->
+
+<body ng-controller="weatherHistoryController as weatherHistory">
+    <input type="text" ng-model="searchModel">
+    <ul>
+        <!-- other available filters can be found here: https://docs.angularjs.org/api/ng/filter 
+        NOTE: multiple filters can be applied by using multiple "|"
+        NOTE: the pecedence of filter operators matters 
+        NOTE: resolving "$$hashKey" error of immutable objects in AngularJS ng-repeat using "track by"-->
+        <li ng-repeat="item in weatherHistory.list track by (item.getType() + item.getUnit() + item.getValue() + item.getTime()) | filter: searchModel">
+            {{item.getType()}} {{item.getUnit()}} {{item.getValue()}} {{item.getPlace()}} <em>{{item.getTime()}}</em>
+        </li>
+    </ul>
+    <!-- ng-submit determinet the function that will run when we are submitting this form-->
+    <form ng-submit="weatherHistory.addWeatherDataToHistory()">
+        <!-- ng-model allows data storage (input is stored into the specified variable)-->
+        <input type="text" placeholder="Type" ng-model="weatherHistory.type">
+        <input type="text" placeholder="Unit" ng-model="weatherHistory.unit">
+        <input type="number" placeholder="Value" ng-model="weatherHistory.value">
+        <input type="text" placeholder="Place" ng-model="weatherHistory.place">
+        <input type="datetime" placeholder="Time" ng-model="weatherHistory.time">
+        <input type="submit" value="Submit" ng-model="submit">
+    </form>
+    <br>
+    <input type="text" ng-model="yourName" placeholder="Enter your name">
+    <!-- {{ }} - this angular tag allows letting know angular
+        that you are using an angular template tag
+        NOTE: this is done automatically-->
+    <h1>Hello {{yourName}}</h1>
+</body>
+
+</html>
