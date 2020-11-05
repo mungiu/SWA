@@ -38,16 +38,6 @@ class ImmutableEvent {
     getTime() { return this.time }
     toString() { return `Place: ${this.getPlace()}, Time - ${this.getTime()}` }
 }
-// var myEvent = new ImmutableEvent('Horsens', null);
-// console.log('TEST IMMUTABLE EVENT');
-// console.log('Data Must Change');
-// console.log(myEvent.toString());
-// var secondEvent = myEvent.setPlace('USA');
-// console.log(secondEvent.toString());
-// console.log('Data Must Remain The Same');
-// console.log(myEvent.toString());
-// myEvent.time = new Date(11111).toLocaleString();
-// console.log(myEvent.toString());
 
 class ImmutableDataType extends ImmutableEvent {
     constructor(_unit, _type, _place, _time) {
@@ -68,18 +58,6 @@ class ImmutableDataType extends ImmutableEvent {
     setType(newType) { return new ImmutableDataType(this.unit, newType, this.place, this.time) }
     toString() { return `Unit: ${this.getUnit()}, Type - ${this.getType()}, Place: ${this.getPlace()}, Time - ${this.getTime()}` }
 }
-// var myDataType = new ImmutableDataType('testUnit', 'testType', 'testPlace', null);
-// console.log()
-// console.log('TEST IMMUTABLE DATA TYPE');
-// console.log('Data Must Change');
-// console.log(myDataType.toString());
-// var secondData = myDataType.setUnit('UNIT_CHANGED');
-// var thirdData = secondData.setType('TYPE_CHANGED');
-// console.log(thirdData.toString());
-// console.log('Data Must Remain The Same');
-// console.log(myDataType.toString());
-// myDataType.type = "MANUALLY FORCED TYPE";
-// console.log(myDataType.toString());
 
 class ImmutableWeatherData extends ImmutableDataType {
     constructor(_value, _unit, _type, _place, _time) {
@@ -97,18 +75,6 @@ class ImmutableWeatherData extends ImmutableDataType {
     setValue(newValue) { return new ImmutableWeatherData(newValue, this.unit, this.type, this.place, this.time) }
     toString() { return `Value: ${this.getValue()}, Unit: ${this.getUnit()}, Type - ${this.getType()}, Place: ${this.getPlace()}, Time - ${this.getTime()}` }
 }
-// var myWeatherData = new ImmutableWeatherData(1, 'testUnit', 'testType', 'testPlace', null);
-// console.log()
-// console.log('TEST IMMUTABLE WEATHER DATA');
-// console.log('Data Must Change');
-// console.log(myWeatherData.toString());
-// var secondData = myWeatherData.setUnit('UNIT_CHANGED');
-// var thirdData = secondData.setType('TYPE_CHANGED');
-// console.log(thirdData.toString());
-// console.log('Data Must Remain The Same');
-// console.log(myWeatherData.toString());
-// myWeatherData.type = "MANUALLY FORCED TYPE";
-// console.log(myWeatherData.toString());
 
 class ImmutableTemperature extends ImmutableWeatherData {
     constructor(_value, _unit, _type, _place, _time) {
@@ -162,22 +128,11 @@ class ImmutableTemperature extends ImmutableWeatherData {
         }
     };
 }
-// var myTemperature = new ImmutableTemperature(1, 'testUnit', 'testType', 'testPlace', null);
-// console.log()
-// console.log('TEST IMMUTABLE TEMPERATURE');
-// console.log('Data Must Change');
-// console.log(myTemperature.toString());
-// var secondData = myTemperature.setUnit('UNIT_CHANGED');
-// var thirdData = secondData.setType('TYPE_CHANGED');
-// console.log(thirdData.toString());
-// console.log('Data Must Remain The Same');
-// console.log(myTemperature.toString());
-// myTemperature.type = "MANUALLY FORCED TYPE";
-// console.log(myTemperature.toString());
 
 class ImmutablePrecipitation extends ImmutableWeatherData {
-    constructor(_value, _unit, _type, _place, _time) {
+    constructor(_precipitation_type, _value, _unit, _type, _place, _time) {
         super(_value, _unit, _type, _place, _time);
+        this.precipitation_type = _precipitation_type;
 
         // MAKE THIS CLASS IMMUTABLE
         if (new.target === ImmutablePrecipitation) {
@@ -185,9 +140,12 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
         }
     }
 
+    getPrecipitationType() { return this.precipitation_type; }
+
     convertToInches() {
         if (this.unit == 'MM') {
             return new ImmutablePrecipitation(
+                this.precipitation_type,
                 (this.value / 25.4),
                 'IN',
                 this.type,
@@ -196,6 +154,7 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
             );
         } else if (this.unit == 'IN') {
             return new ImmutablePrecipitation(
+                this.precipitation_type,
                 this.value,
                 this.unit,
                 this.type,
@@ -208,6 +167,7 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
     convertToMM() {
         if (this.unit == 'IN') {
             return new ImmutablePrecipitation(
+                this.precipitation_type,
                 (this.value * 0.0393701),
                 'MM',
                 this.type,
@@ -216,6 +176,7 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
             );
         } else if (this.unit == 'MM') {
             return new ImmutablePrecipitation(
+                this.precipitation_type,
                 this.value,
                 this.unit,
                 this.type,
@@ -225,18 +186,6 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
         }
     };
 }
-// var myPrecipitation = new ImmutablePrecipitation(1, 'testUnit', 'testType', 'testPlace', null);
-// console.log()
-// console.log('TEST IMMUTABLE PRECIPITATION');
-// console.log('Data Must Change');
-// console.log(myPrecipitation.toString());
-// var secondData = myPrecipitation.setUnit('UNIT_CHANGED');
-// var thirdData = secondData.setType('TYPE_CHANGED');
-// console.log(thirdData.toString());
-// console.log('Data Must Remain The Same');
-// console.log(myPrecipitation.toString());
-// myPrecipitation.type = "MANUALLY FORCED TYPE";
-// console.log(myPrecipitation.toString());
 
 class ImmutableWind extends ImmutableWeatherData {
     constructor(_value, _unit, _type, _place, _time) {
@@ -288,18 +237,6 @@ class ImmutableWind extends ImmutableWeatherData {
         }
     };
 }
-// var myWind = new ImmutableWind(1, 'testUnit', 'testType', 'testPlace', null);
-// console.log()
-// console.log('TEST IMMUTABLE WIND');
-// console.log('Data Must Change');
-// console.log(myWind.toString());
-// var secondData = myWind.setUnit('UNIT_CHANGED');
-// var thirdData = secondData.setType('TYPE_CHANGED');
-// console.log(thirdData.toString());
-// console.log('Data Must Remain The Same');
-// console.log(myWind.toString());
-// myWind.type = "MANUALLY FORCED TYPE";
-// console.log(myWind.toString());
 
 class ImmutableCloudCoverage extends ImmutableWeatherData {
     constructor(_value, _unit, _type, _place, _time) {
@@ -313,18 +250,6 @@ class ImmutableCloudCoverage extends ImmutableWeatherData {
 
     getCoverageType() { return this.type }
 }
-// var myCloudCoverage = new ImmutableCloudCoverage(1, 'testUnit', 'testType', 'testPlace', null);
-// console.log()
-// console.log('TEST IMMUTABLE CLOUDCOVERAGE');
-// console.log('Data Must Change');
-// console.log(myCloudCoverage.toString());
-// var secondData = myCloudCoverage.setUnit('UNIT_CHANGED');
-// var thirdData = secondData.setType('TYPE_CHANGED');
-// console.log(thirdData.toString());
-// console.log('Data Must Remain The Same');
-// console.log(myCloudCoverage.toString());
-// myCloudCoverage.type = "MANUALLY FORCED TYPE";
-// console.log(myCloudCoverage.toString());
 
 
 ////////////////////// HELPER METHODS START ////////////////////////
@@ -342,7 +267,7 @@ class MyDateInterval {
     getFrom() { return this.fromDate };
     setPlace(newFromDate) { return new MyDateInterval(newFromDate, this.toDate) };
 
-    getTo() { return this.to };
+    getTo() { return this.toDate };
     setPlace(newToDate) { return new MyDateInterval(this.fromDate, newToDate) };
 
     contains(cDate) {
@@ -399,6 +324,15 @@ angular.module('weatherApp', [])
             }
             helperFunctionsService.myMap = (a, f) => reduce(a, (arr, v) => [...arr, f(v)], []);
             helperFunctionsService.myFilter = (a, f) => reduce(a, (arr, v) => p(v) ? [...arr, p(v)] : arr, []);
+            helperFunctionsService.getId = () => {
+                var text = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+                for (var i = 0; i < 5; i++)
+                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+                return text;
+            }
 
             //returning the service object
             return helperFunctionsService;
@@ -409,37 +343,120 @@ angular.module('weatherApp', [])
 
             $log.log('Instantiating "weatherHistoryFactory"...');
             let weatherHistoryService = {};
+            //DONE
+            updateWeatherHistory = (jsonData, weatherHistoryArr) => {
+                // accessing the ng-model name and age and pushing them into the current list
+                let temp = null;
 
-            weatherHistoryService.forPlace = (place, immutableWeatherDataArr) => {
-                let tempArr = null;
-                immutableWeatherDataArr.forEach(element => {
-                    if (element.getPlace() == place)
-                        tempArr += element;
-                });
+                if (jsonData.type === 'wind speed')
+                    temp = new ImmutableWind(
+                        jsonData.value,
+                        jsonData.unit,
+                        jsonData.type,
+                        jsonData.place,
+                        jsonData.time);
+                else if (jsonData.type === 'cloud coverage')
+                    temp = new ImmutableCloudCoverage(
+                        jsonData.value,
+                        jsonData.unit,
+                        jsonData.type,
+                        jsonData.place,
+                        jsonData.time);
+                else if (jsonData.type === 'precipitation')
+                    temp = new ImmutablePrecipitation(
+                        jsonData.precipitation_type,
+                        jsonData.value,
+                        jsonData.unit,
+                        jsonData.type,
+                        jsonData.place,
+                        jsonData.time);
+                else if (jsonData.type === 'temperature')
+                    temp = new ImmutableTemperature(
+                        jsonData.value,
+                        jsonData.unit,
+                        jsonData.type,
+                        jsonData.place,
+                        jsonData.time);
+                else
+                    $log.log('Received unknown weather "TYPE"...')
 
-                return tempArr;
+                if (temp != null)
+                    weatherHistoryArr.push(temp);
+            }
+            //DONE
+            weatherHistoryService.getAll = (weatherHistoryListView) => {
+                $http({
+                    url: 'http://localhost:8080/data',
+                    method: 'GET'
+                })
+                    .then(
+                        // SUCCESS
+                        function (response) {
+                            let objList = response.data;
+                            objList.forEach(function (item) { this.updateWeatherHistory(item, weatherHistoryListView); });
+                        },
+                        // FAILURE
+                        function () {
+                            $log.log('URL GET request failed for: ' + url)
+                        })
+            }
+            //DONE
+            weatherHistoryService.forPlace = (place, weatherHistoryListView) => {
+                $http({
+                    url: 'http://localhost:8080/data/' + place,
+                    method: 'GET'
+                })
+                    .then(
+                        // SUCCESS
+                        function (response) {
+                            let objList = response.data;
+                            objList.forEach(function (item) { this.updateWeatherHistory(item, weatherHistoryListView); });
+                        },
+                        // FAILURE
+                        function (response) {
+                            $log.log('URL GET request failed for: ' + url + 'With response: ' + response)
+                        })
             }
 
             weatherHistoryService.forUnit = (unit, immutableWeatherDataArr) => {
-                let tempArr = null;
+                let tempArr = [];
+                let index = 0;
                 immutableWeatherDataArr.forEach(element => {
                     if (element.getUnit() == unit)
-                        tempArr += element;
+                        tempArr[index++] = element;
                 });
 
                 return tempArr;
             }
 
-            weatherHistoryService.forPeriod = (myDateInterval, immutableWeatherDataArr) => {
-                let tempArr = null;
-                immutableWeatherDataArr.forEach(element => {
-                    if (element.getTime() >= myDateInterval.getFrom()
-                        && element.getTime() <= myDateInterval.getTo())
-                        tempArr += element;
-                });
+            //DONE
+            weatherHistoryService.forPeriod = (myDateInterval, weatherHistoryListView) => {
+                $http({
+                    url: 'http://localhost:8080/data',
+                    method: 'GET'
+                })
+                    .then(
+                        // SUCCESS
+                        //// anything involving '=' should use the '+' prefix
+                        // // it will then compare the dates' millisecond values
+                        // +x <= +y;  => true
+                        // +x >= +y;  => true
+                        // +x === +y; => true
+                        function (response) {
+                            let objList = response.data;
+                            objList.forEach(function (item) {
+                                if (new Date(item.time).getTime() >= myDateInterval.getFrom().getTime()
+                                    && new Date(item.time).getTime() <= myDateInterval.getTo().getTime())
+                                    this.updateWeatherHistory(item, weatherHistoryListView);
+                            });
+                        },
+                        // FAILURE
+                        function () {
+                            $log.log('URL GET request failed for: ' + url)
+                        })
 
-                return tempArr;
             }
+
 
             weatherHistoryService.including = (weatherDataArr, immutableWeatherDataArr) => {
                 let tempArr = null;
@@ -622,13 +639,15 @@ angular.module('weatherApp', [])
 
                 return cloudCoverageData;
             }
+
             return weatherHistoryService;
         }])
     /** NOTE: the passed in parameters are what the controlelr will try to instantiate */
     .controller('weatherHistoryController', [
-        'helperFunctionsFactory', 'weatherHistoryFactory',
-        function (helperFunctionsFactory, weatherHistoryFactory) {
+        'weatherHistoryFactory',
+        function (weatherHistoryFactory) {
             let weatherHistory = this;                      // this refers to the controller itself, so we no longer need $scope
+            weatherHistory.whFactory = weatherHistoryFactory;   // this helps ensure that the service acts withing "this" scope
             // let fromDateFactory = myDateIntervalFactory.getFrom(); // calling the result of the passed in factory
             // let fromDateService = myDateIntervalService.getFrom(); // calling the service methods directly
 
@@ -636,61 +655,27 @@ angular.module('weatherApp', [])
             weatherHistory.list = [
                 new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 1)),
                 new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 2)),
-                new ImmutablePrecipitation(value = 10, unit = 'MM', type = 'RAIN', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 3)),
-                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 4))
+                new ImmutablePrecipitation(precipitation_type = "SLEET", value = 10, unit = 'MM', type = 'RAIN', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 3)),
+                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 4)),
+                new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 1, 1)),
+                new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 2, 2)),
+                new ImmutablePrecipitation(precipitation_type = "SNOW", value = 10, unit = 'MM', type = 'RAIN', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 3, 3)),
+                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 4, 4))
             ];
 
-            weatherHistory.addWeatherDataToHistory = function () {
-                // accessing the ng-model name and age and pushing them into the current list
-                //N/NW/NE/S/SW/SE
-                let temp = null;
-                if (weatherHistory.type === 'N' ||
-                    weatherHistory.type === 'NW' ||
-                    weatherHistory.type === 'NE' ||
-                    weatherHistory.type === 'W' ||
-                    weatherHistory.type === 'E' ||
-                    weatherHistory.type === 'SW' ||
-                    weatherHistory.type === 'SE' ||
-                    weatherHistory.type === 'S')
-                    temp = new ImmutableWind(
-                        weatherHistory.value,
-                        weatherHistory.unit,
-                        weatherHistory.type,
-                        weatherHistory.place,
-                        weatherHistory.time);
-                else if (weatherHistory.type === 'CLEAR' ||
-                    weatherHistory.type === 'PARTLY CLOUDY' ||
-                    weatherHistory.type === 'CLOUDY')
-                    temp = new ImmutableCloudCoverage(
-                        weatherHistory.value,
-                        weatherHistory.unit,
-                        weatherHistory.type,
-                        weatherHistory.place,
-                        weatherHistory.time);
-                else if (weatherHistory.type === 'RAIN' ||
-                    weatherHistory.type === 'SLEET' ||
-                    weatherHistory.type === 'HAIL' ||
-                    weatherHistory.type === 'SNOW')
-                    temp = new ImmutablePrecipitation(
-                        weatherHistory.value,
-                        weatherHistory.unit,
-                        weatherHistory.type,
-                        weatherHistory.place,
-                        weatherHistory.time);
-                else temp = new ImmutableTemperature(
-                    weatherHistory.value,
-                    weatherHistory.unit,
-                    weatherHistory.type,
-                    weatherHistory.place,
-                    weatherHistory.time);
-
-
-                weatherHistory.list.push(temp);
-                // reseting the ng-model values
-                weatherHistory.type = '';
-                weatherHistory.unit = '';
-                weatherHistory.value = 0;
-                weatherHistory.place = '';
-                weatherHistory.time = '';
+            weatherHistory.getAllWeatherHistory = () => {
+                weatherHistory.list = [];
+                weatherHistory.whFactory.getAll(weatherHistory.list);
             }
+
+            weatherHistory.getWeatherHistoryForPlace = () => {
+                weatherHistory.list = [];
+                weatherHistory.whFactory.forPlace(weatherHistory.place, weatherHistory.list);
+            }
+
+            weatherHistory.getWeatherHistoryDateInterval = () => {
+                weatherHistory.list = [];
+                weatherHistory.whFactory.forPeriod(new MyDateInterval(weatherHistory.fromDate, weatherHistory.toDate), weatherHistory.list);
+            }
+
         }]);
