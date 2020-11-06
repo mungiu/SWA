@@ -251,7 +251,6 @@ class ImmutableCloudCoverage extends ImmutableWeatherData {
     getCoverageType() { return this.type }
 }
 
-
 ////////////////////// HELPER METHODS START ////////////////////////
 class MyDateInterval {
     constructor(_fromDate, _toDate) {
@@ -284,30 +283,6 @@ class MyDateInterval {
 /////////////////////// HELPER METHODS END ////////////////////////
 
 angular.module('weatherApp', [])
-    // .config(["myDateIntervalConfiguredServiceProvider", function () {
-    //     // NOTE: the provider name should be <<serviceName>> + "Provider"
-    //     // NOTE: the provider is executed during the "congif" stage
-    //     // BEFORE any controller or any service, it configures a "provider"
-    // }])
-    // .provider('myDateIntervalConfiguredService', function () {
-    //     // provider is used to instantiate a service that requires pre-configuration
-    //     let baseURL = '';
-    //     this.config = function (url) { baseURL = url; };
-    //     this.$get = function () {
-    //         //creating a service object
-    //         let myDateIntervalService = { fromDate: fromDate, toDate: toDate };
-    //         //defining the service object functionality
-    //         myDateIntervalService.getFrom = function () { return myDateIntervalService.fromDate }
-    //         //returning the service object
-    //         return myDateIntervalService;
-    //     }
-    // })
-    // .service('myDateIntervalService', function () {
-    //     // no need to create service object, the instantiation of the service object is done by AngularJS
-    //     // we add all members directly to .this service definition
-    //     // also there is no need to return it, it can be passed in and called
-    //     this.getFrom = function () { return myDateIntervalService.fromDate }
-    // })
     .factory('helperFunctionsFactory', [
         '$log',
         function ($log) {
@@ -428,7 +403,6 @@ angular.module('weatherApp', [])
 
                 return tempArr;
             }
-
             //DONE
             weatherHistoryService.forPeriod = (myDateInterval, weatherHistoryListView) => {
                 $http({
@@ -456,7 +430,6 @@ angular.module('weatherApp', [])
                         })
 
             }
-
 
             weatherHistoryService.including = (weatherDataArr, immutableWeatherDataArr) => {
                 let tempArr = null;
@@ -642,17 +615,139 @@ angular.module('weatherApp', [])
 
             return weatherHistoryService;
         }])
-    /** NOTE: the passed in parameters are what the controlelr will try to instantiate */
-    .controller('weatherHistoryController', [
-        'weatherHistoryFactory',
-        function (weatherHistoryFactory) {
-            let weatherHistory = this;                      // this refers to the controller itself, so we no longer need $scope
-            weatherHistory.whFactory = weatherHistoryFactory;   // this helps ensure that the service acts withing "this" scope
-            // let fromDateFactory = myDateIntervalFactory.getFrom(); // calling the result of the passed in factory
-            // let fromDateService = myDateIntervalService.getFrom(); // calling the service methods directly
+    .factory('weatherForecastFactory', [
+        '$http', '$log', 'helperFunctionsFactory',
+        function ($http, $log, helperFunctionsFactory) {
 
+            $log.log('Instantiating "weatherForecastFactory"...');
+            let weatherForecastService = {};
+
+            updateWeatherForecast = (jsonData, weatherForecastArr) => {
+                // accessing the ng-model name and age and pushing them into the current list
+                let temp = null;
+
+                if (jsonData.type === 'wind speed')
+                    temp = new ImmutableWind(
+                        jsonData.value,
+                        jsonData.unit,
+                        jsonData.type,
+                        jsonData.place,
+                        jsonData.time);
+                else if (jsonData.type === 'cloud coverage')
+                    temp = new ImmutableCloudCoverage(
+                        jsonData.value,
+                        jsonData.unit,
+                        jsonData.type,
+                        jsonData.place,
+                        jsonData.time);
+                else if (jsonData.type === 'precipitation')
+                    temp = new ImmutablePrecipitation(
+                        jsonData.precipitation_type,
+                        jsonData.value,
+                        jsonData.unit,
+                        jsonData.type,
+                        jsonData.place,
+                        jsonData.time);
+                else if (jsonData.type === 'temperature')
+                    temp = new ImmutableTemperature(
+                        jsonData.value,
+                        jsonData.unit,
+                        jsonData.type,
+                        jsonData.place,
+                        jsonData.time);
+                else
+                    $log.log('Received unknown weather "TYPE"...')
+
+                if (temp != null)
+                    weatherForecastArr.push(temp);
+            }
+
+            weatherForecastService.getAll = (weatherForecastListView) => {
+                $http({
+                    url: 'http://localhost:8080/forecast',
+                    method: 'GET'
+                })
+                    .then(
+                        // SUCCESS
+                        function (response) {
+                            let objList = response.data;
+                            objList.forEach(function (item) { this.updateWeatherForecast(item, weatherForecastListView); });
+                        },
+                        // FAILURE
+                        function () {
+                            $log.log('URL GET request failed for: ' + url)
+                        })
+            }
+
+            weatherForecastService.addWeatherPrediction = (data) => { this.weatherPrediction.push(data) }
+
+            weatherForecastService.includesData = (data) => {
+                //const filterData = this.weatherPrediction.filter(prediction => )
+                //use filter to find a single weatherPrediction within the weatherForecast array
+            }
+
+            //return the forecast per these defined places, types and/or periods
+            weatherForecastService.forPlace = (place) => // works
+            {
+                const filteredPlaces = this.weatherPrediction.filter(prediction => prediction.place == place)
+                return filteredPlaces
+            }
+            weatherForecastService.forType = (type) => {
+                const filteredTypes = this.weatherPrediction.filter(prediction => prediction.type == type)
+                return filteredTypes
+            }
+            weatherForecastService.forPeriod = (periodStart, periodEnd) => {
+                // try using date interval contains 
+                const filteredPeriod = this.weatherPrediction.filter(prediction =>
+                    prediction.time >= periodStart && prediction.time <= periodEnd)
+                return filteredPeriod
+            }
+
+            weatherForecastService.convertToUsUnits = () => {
+                //use map to convert every unit of from and to into international units
+                const convertedArray = this.weatherPrediction.map((obj, p) => {
+                    switch (p) {
+                        case "CELSIUS":
+                            obj.convertToFahrenheit  // how to access this method?
+                            break;
+                        case "MM":
+                            break;
+                        case "MS":
+                            break;
+                        default:
+                            break;
+                    }
+                    return convertedArray
+                })
+            }
+            weatherForecastService.convertToMetricUnits = () => {
+                //use map to convert every unit of from and to into metric units
+            }
+
+            weatherForecastService.averageFromValue = () => // can't get the from value?
+            {
+                //use reduce to gather all from values in the weatherForecast array and return the result
+                const reduceFrom = (sum, fromValue) => (sum + fromValue.fromNum) / this.weatherPrediction.length
+                const average = this.weatherPrediction.reduce(reduceFrom)
+                return average
+            }
+            weatherForecastService.averageToValue = () => {
+                //use reduce to gather all to values in the weatherForecast array and return the result
+                const reduceTo = (average, to, _, { length }) => average + to.toNum / length;
+                return this.weatherPrediction.reduce(reduceTo);
+            }
+
+            return weatherForecastService;
+        }])
+    /** NOTE: the passed in parameters are what the controlelr will try to instantiate */
+    .controller('weatherController', [
+        'weatherHistoryFactory', 'weatherForecastFactory',
+        function (weatherHistoryFactory, weatherForecastFactory) {
+            let weatherCtrl = this;                      // this refers to the controller itself, so we no longer need $scope
+            weatherCtrl.whFactory = weatherHistoryFactory;   // this helps ensure that the service acts withing "this" scope
+            weatherCtrl.wfFactory = weatherForecastFactory;
             // TODO: this has to be replaced with real database call to database
-            weatherHistory.list = [
+            weatherCtrl.historyList = [
                 new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 1)),
                 new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 2)),
                 new ImmutablePrecipitation(precipitation_type = "SLEET", value = 10, unit = 'MM', type = 'RAIN', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 3)),
@@ -660,22 +755,85 @@ angular.module('weatherApp', [])
                 new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 1, 1)),
                 new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 2, 2)),
                 new ImmutablePrecipitation(precipitation_type = "SNOW", value = 10, unit = 'MM', type = 'RAIN', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 3, 3)),
-                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 4, 4))
-            ];
+                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 4, 4))];
 
-            weatherHistory.getAllWeatherHistory = () => {
-                weatherHistory.list = [];
-                weatherHistory.whFactory.getAll(weatherHistory.list);
+            weatherCtrl.forecastList = [
+                new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 1)),
+                new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 2)),
+                new ImmutablePrecipitation(precipitation_type = "SLEET", value = 10, unit = 'MM', type = 'RAIN', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 3)),
+                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 4)),
+                new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 1, 1)),
+                new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 2, 2)),
+                new ImmutablePrecipitation(precipitation_type = "SNOW", value = 10, unit = 'MM', type = 'RAIN', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 3, 3)),
+                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 4, 4))];
+
+            weatherCtrl.getAllWeatherHistory = () => {
+                weatherCtrl.historyList = [];
+                weatherCtrl.whFactory.getAll(weatherCtrl.historyList);
             }
 
-            weatherHistory.getWeatherHistoryForPlace = () => {
-                weatherHistory.list = [];
-                weatherHistory.whFactory.forPlace(weatherHistory.place, weatherHistory.list);
+            weatherCtrl.getWeatherHistoryForPlace = () => {
+                weatherCtrl.historyList = [];
+                weatherCtrl.whFactory.forPlace(weatherCtrl.place, weatherCtrl.historyList);
             }
 
-            weatherHistory.getWeatherHistoryDateInterval = () => {
-                weatherHistory.list = [];
-                weatherHistory.whFactory.forPeriod(new MyDateInterval(weatherHistory.fromDate, weatherHistory.toDate), weatherHistory.list);
+            weatherCtrl.getWeatherHistoryDateInterval = () => {
+                weatherCtrl.historyList = [];
+                weatherCtrl.whFactory.forPeriod(new MyDateInterval(weatherCtrl.fromDate, weatherCtrl.toDate), weatherCtrl.list);
+            }
+
+            weatherCtrl.getAllWeatherForecast = () => {
+                weatherCtrl.forecastList = [];
+                weatherCtrl.wfFactory.getAll(weatherCtrl.forecastList);
+            }
+
+            weatherCtrl.getWeatherForecastForPlace = () => {
+                weatherCtrl.forecastList = [];
+                weatherCtrl.wfFactory.forPlace(weatherCtrl.place, weatherCtrl.forecastList);
+            }
+
+            weatherCtrl.getWeatherForecastDateInterval = () => {
+                weatherCtrl.forecastList = [];
+                weatherCtrl.wfFactory.forPeriod(new MyDateInterval(weatherCtrl.fromDate, weatherCtrl.toDate), weatherCtrl.list);
             }
 
         }]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //     // .config(["myDateIntervalConfiguredServiceProvider", function () {
+    //     // NOTE: the provider name should be <<serviceName>> + "Provider"
+    //     // NOTE: the provider is executed during the "congif" stage
+    //     // BEFORE any controller or any service, it configures a "provider"
+    // }])
+    // .provider('myDateIntervalConfiguredService', function () {
+    //     // provider is used to instantiate a service that requires pre-configuration
+    //     let baseURL = '';
+    //     this.config = function (url) { baseURL = url; };
+    //     this.$get = function () {
+    //         //creating a service object
+    //         let myDateIntervalService = { fromDate: fromDate, toDate: toDate };
+    //         //defining the service object functionality
+    //         myDateIntervalService.getFrom = function () { return myDateIntervalService.fromDate }
+    //         //returning the service object
+    //         return myDateIntervalService;
+    //     }
+    // })
+    // .service('myDateIntervalService', function () {
+    //     // no need to create service object, the instantiation of the service object is done by AngularJS
+    //     // we add all members directly to .this service definition
+    //     // also there is no need to return it, it can be passed in and called
+    //     this.getFrom = function () { return myDateIntervalService.fromDate }
+    // })
