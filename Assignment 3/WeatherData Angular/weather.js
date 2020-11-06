@@ -386,7 +386,7 @@ angular.module('weatherApp', [])
                         jsonData.type,
                         jsonData.place,
                         jsonData.time,
-                        jsonData.precipitation_types,
+                        jsonData.precipitation_type,
                         jsonData.from,
                         jsonData.to);
                 else if (jsonData.type === 'temperature')
@@ -399,27 +399,28 @@ angular.module('weatherApp', [])
                         jsonData.from,
                         jsonData.to);
                 else
-                    $log.log('Received unknown weather "TYPE"...')
+                    $log.log('Received unknown weather "TYPE"...' + jsonData.type)
 
                 if (temp != null)
                     weatherHistoryArr.push(temp);
             }
 
-            weatherHistoryService.pushData = (jsonData) => {
-                $http({
-                    url: 'http://localhost:8080/data',
-                    method: 'POST',
-                    data: jsonData
-                })
+            weatherHistoryService.pushData = (data) => {
+                let jsonString = JSON.stringify(data);
+
+                $http.post('http://localhost:8080/data', JSON.stringify(data))
                     .then(
                         // SUCCESS
-                        function () {
-                            $log.log('URL POST request successful for: ' + url)
+                        function (response) {
+                            if (response.data)
+                                $log.log('URL POST request successful for: ' + url)
                         },
                         // FAILURE
-                        function () {
+                        function (response) {
                             $log.log('URL POST request failed for: ' + url)
-                        })
+                            $log.log('Status: ' + response.status)
+                            $log.log('Test: ' + response.text)
+                        });
             }
 
             //DONE
@@ -725,7 +726,7 @@ angular.module('weatherApp', [])
                         jsonData.from,
                         jsonData.to);
                 else
-                    $log.log('Received unknown weather "TYPE"...')
+                    $log.log('Received unknown weather "TYPE"...' + jsonData.type)
 
                 if (temp != null)
                     weatherForecastArr.push(temp);
@@ -876,8 +877,15 @@ angular.module('weatherApp', [])
             }
 
             weatherCtrl.pushWeatherHistory = () => {
-                weatherCtrl.forecastList = [];
-                weatherCtrl.whFactory.pushData(/*View data converted to JSON or convert inside service*/);
+                let place = weatherCtrl.place;
+                let type = weatherCtrl.type;
+                let precipitation_type = weatherCtrl.specificType;
+                let direction = weatherCtrl.specificType;
+                let unit = weatherCtrl.unit;
+                let time = weatherCtrl.time;
+                let value = weatherCtrl.value;
+
+                weatherCtrl.whFactory.pushData({ place, type, precipitation_type, direction, unit, time, value });
             }
 
         }]);

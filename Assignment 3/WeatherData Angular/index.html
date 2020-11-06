@@ -36,12 +36,10 @@ NOTE: controllers can be generally considered as classes-->
             </form>
             <form ng-submit="weatherCtrl.getWeatherHistoryDateInterval()">
                 <input type="submit" value="Get weather history for time period" ng-model="submit">
-                starting from:<input type="datetime-local" id="exampleInput" name="input"
-                    ng-model="weatherCtrl.fromDateHistory" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
-                    max="3000-12-31T00:00:00" required />
-                up till: <input type="datetime-local" id="exampleInput" name="input"
-                    ng-model="weatherCtrl.toDateHistory" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
-                    max="3000-12-31T00:00:00" required />
+                starting from:<input type="datetime-local" ng-model="weatherCtrl.fromDateHistory"
+                    placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00" max="3000-12-31T00:00:00" required />
+                up till: <input type="datetime-local" ng-model="weatherCtrl.toDateHistory"
+                    placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00" max="3000-12-31T00:00:00" required />
             </form>
         </div>
         <div>
@@ -54,12 +52,10 @@ NOTE: controllers can be generally considered as classes-->
             </form>
             <form ng-submit="weatherCtrl.getWeatherForecastDateInterval()">
                 <input type="submit" value="Get weather forecast for time period" ng-model="submit">
-                starting from:<input type="datetime-local" id="exampleInput" name="input"
-                    ng-model="weatherCtrl.fromDateForecast" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
-                    max="3000-12-31T00:00:00" required />
-                up till: <input type="datetime-local" id="exampleInput" name="input"
-                    ng-model="weatherCtrl.toDateForecast" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
-                    max="3000-12-31T00:00:00" required />
+                starting from:<input type="datetime-local" ng-model="weatherCtrl.fromDateForecast"
+                    placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00" max="3000-12-31T00:00:00" required />
+                up till: <input type="datetime-local" ng-model="weatherCtrl.toDateForecast"
+                    placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00" max="3000-12-31T00:00:00" required />
             </form>
         </div>
     </div>
@@ -67,7 +63,13 @@ NOTE: controllers can be generally considered as classes-->
     Add historical data:
     <form ng-submit="weatherCtrl.pushWeatherHistory()">
         <input type="submit" value="Push weather history" ng-model="submit">
-        <input type="text" ng-model="weatherCtrl.push" placeholder="Specify location...">
+        <input type="text" ng-model="weatherCtrl.place" placeholder="Specify place...">
+        <input type="text" ng-model="weatherCtrl.type" placeholder="Specify type...">
+        <input type="text" ng-model="weatherCtrl.specificType" placeholder="Specify specific type...">
+        <input type="text" ng-model="weatherCtrl.unit" placeholder="Specify unit...">
+        <input type="datetime-local" ng-model="weatherCtrl.time" placeholder="yyyy-MM-ddTHH:mm:ss"
+            min="1000-01-01T00:00:00" max="3000-12-31T00:00:00" required />
+        <input type="text" ng-model="weatherCtrl.value" placeholder="Specify value...">
     </form>
     <br>
     Filter by <input type="text" ng-model="searchModel" placeholder="type, location, time... etc">
@@ -89,7 +91,7 @@ NOTE: controllers can be generally considered as classes-->
                 <td><b>{{item.getPlace()}}</b></td>
                 <td>{{item.getType() | lowercase}}</td>
                 <td>{{item.getValue()}}({{item.getUnit() | lowercase}})
-                    <br>{{(item.getPrecipitationType() != null) ? item.getPrecipitationType() : ''}}{{(item.getDirection() != null) ? item.getDirection() : ''}}
+                    {{(item.getPrecipitationType() != null) ? item.getPrecipitationType() : ''}}{{(item.getDirection() != null) ? item.getDirection() : ''}}
                 </td>
                 <td><em>{{item.getTime() | date : "short" }}</em></td>
             </tr>
