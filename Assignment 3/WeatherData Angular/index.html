@@ -9,7 +9,7 @@
     </title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.0/angular.js"></script>
     <!-- Importing weatherController-->
-    <script src="weatherHistory.js"></script>
+    <script src="weather.js"></script>
 </head>
 
 <!-- The ng-controller directive allows us to choose a controller and instantiate is 
@@ -32,15 +32,16 @@ NOTE: controllers can be generally considered as classes-->
             </form>
             <form ng-submit="weatherCtrl.getWeatherHistoryForPlace()">
                 <input type="submit" value="Get weather history for location" ng-model="submit">
-                <input type="text" ng-model="weatherHistory.place" placeholder="Specify location...">
+                <input type="text" ng-model="weatherCtrl.placeHistory" placeholder="Specify location...">
             </form>
             <form ng-submit="weatherCtrl.getWeatherHistoryDateInterval()">
                 <input type="submit" value="Get weather history for time period" ng-model="submit">
                 starting from:<input type="datetime-local" id="exampleInput" name="input"
-                    ng-model="weatherCtrl.fromDate" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
+                    ng-model="weatherCtrl.fromDateHistory" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
                     max="3000-12-31T00:00:00" required />
-                up till: <input type="datetime-local" id="exampleInput" name="input" ng-model="weatherCtrl.toDate"
-                    placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00" max="3000-12-31T00:00:00" required />
+                up till: <input type="datetime-local" id="exampleInput" name="input"
+                    ng-model="weatherCtrl.toDateHistory" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
+                    max="3000-12-31T00:00:00" required />
             </form>
         </div>
         <div>
@@ -49,19 +50,25 @@ NOTE: controllers can be generally considered as classes-->
             </form>
             <form ng-submit="weatherCtrl.getWeatherForecastForPlace()">
                 <input type="submit" value="Get weather forecast for location" ng-model="submit">
-                <input type="text" ng-model="weatherCtrl.place" placeholder="Specify location...">
+                <input type="text" ng-model="weatherCtrl.placeForecast" placeholder="Specify location...">
             </form>
             <form ng-submit="weatherCtrl.getWeatherForecastDateInterval()">
                 <input type="submit" value="Get weather forecast for time period" ng-model="submit">
                 starting from:<input type="datetime-local" id="exampleInput" name="input"
-                    ng-model="weatherCtrl.fromDate" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
+                    ng-model="weatherCtrl.fromDateForecast" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
                     max="3000-12-31T00:00:00" required />
-                up till: <input type="datetime-local" id="exampleInput" name="input" ng-model="weatherCtrl.toDate"
-                    placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00" max="3000-12-31T00:00:00" required />
+                up till: <input type="datetime-local" id="exampleInput" name="input"
+                    ng-model="weatherCtrl.toDateForecast" placeholder="yyyy-MM-ddTHH:mm:ss" min="1000-01-01T00:00:00"
+                    max="3000-12-31T00:00:00" required />
             </form>
         </div>
     </div>
     <br>
+    Add historical data:
+    <form ng-submit="weatherCtrl.pushWeatherHistory()">
+        <input type="submit" value="Push weather history" ng-model="submit">
+        <input type="text" ng-model="weatherCtrl.push" placeholder="Specify location...">
+    </form>
     <br>
     Filter by <input type="text" ng-model="searchModel" placeholder="type, location, time... etc">
     <br>
@@ -82,7 +89,8 @@ NOTE: controllers can be generally considered as classes-->
                 <td><b>{{item.getPlace()}}</b></td>
                 <td>{{item.getType() | lowercase}}</td>
                 <td>{{item.getValue()}}({{item.getUnit() | lowercase}})
-                    {{(item.getPrecipitationType() != null) ? item.getPrecipitationType() : ''}}</td>
+                    <br>{{(item.getPrecipitationType() != null) ? item.getPrecipitationType() : ''}}{{(item.getDirection() != null) ? item.getDirection() : ''}}
+                </td>
                 <td><em>{{item.getTime() | date : "short" }}</em></td>
             </tr>
         </table>
@@ -97,8 +105,10 @@ NOTE: controllers can be generally considered as classes-->
                 ng-repeat="item in weatherCtrl.forecastList | filter: searchModel track by item.getUnit() + item.getType() + item.getTime() + item.getPlace()">
                 <td><b>{{item.getPlace()}}</b></td>
                 <td>{{item.getType() | lowercase}}</td>
-                <td>{{item.getValue()}}({{item.getUnit() | lowercase}})
-                    {{(item.getPrecipitationType() != null) ? item.getPrecipitationType() : ''}}</td>
+                <td>{{item.getFrom()}}({{item.getUnit() | lowercase}}) to
+                    {{item.getTo()}}({{item.getUnit() | lowercase}})
+                    {{(item.getPrecipitationType() != null) ? item.getPrecipitationType() : ''}}{{(item.getDirections() != null) ? item.getDirections() : ''}}
+                </td>
                 <td><em>{{item.getTime() | date : "short" }}</em></td>
             </tr>
         </table>

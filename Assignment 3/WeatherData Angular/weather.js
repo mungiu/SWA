@@ -1,23 +1,3 @@
-//////// WIND
-// Type: N/NW/NE/S/SW/SE
-// Unit: MS MPH
-// Value:
-//////// Could Coverage
-// Type: CLEAR / PARTLY CLOUD / CLOUDY
-// Unit: %
-// Value:
-//      0%  - 33 % = CLEAR
-//      34% - 66 % = PARTLY CLOUDY
-//      67% - 100% = CLOUDY
-//////// PRECIPITATION
-// Type: RAIN SLEET HAIL SNOW
-// Unit: MM IN
-// Value: 
-//////// TEMPERATURE
-// Type: NOT APPLICABLE
-// Unit: FAHRENHEIT CELSIUS
-// Value:
-
 class ImmutableEvent {
     constructor(_place, _time) {
         this.place = _place;
@@ -77,8 +57,10 @@ class ImmutableWeatherData extends ImmutableDataType {
 }
 
 class ImmutableTemperature extends ImmutableWeatherData {
-    constructor(_value, _unit, _type, _place, _time) {
+    constructor(_value, _unit, _type, _place, _time, _from, _to) {
         super(_value, _unit, _type, _place, _time);
+        this.from = _from;
+        this.to = _to;
 
         // MAKE THIS CLASS IMMUTABLE
         if (new.target === ImmutableTemperature) {
@@ -86,15 +68,21 @@ class ImmutableTemperature extends ImmutableWeatherData {
         }
     }
 
+    getFrom() { return this.from; }
+
+    getTo() { return this.to; }
+
     // (0°C × 9/5) + 32 = 32°F
     convertToF() {
         if (this.unit == 'celsius') {
             return new ImmutableTemperature(
-                (this.value * (9 / 5) + 32),
+                this.value != null ? (this.value * (9 / 5) + 32) : null,
                 'fahrenheit',
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.from != null ? (this.from * (9 / 5) + 32) : null,
+                this.to != null ? (this.to * (9 / 5) + 32) : null
             );
         } else if (this.unit == 'fahrenheit') {
             return new ImmutableTemperature(
@@ -102,7 +90,9 @@ class ImmutableTemperature extends ImmutableWeatherData {
                 this.unit,
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.from,
+                this.to
             );
         }
     };
@@ -111,11 +101,13 @@ class ImmutableTemperature extends ImmutableWeatherData {
     convertToC() {
         if (this.unit == 'fahrenheit') {
             return new ImmutableTemperature(
-                (this.value - 32) * (5 / 9),
+                this.value != null ? (this.value - 32) * (5 / 9) : null,
                 'celsius',
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.from != null ? (this.from - 32) * (5 / 9) : null,
+                this.to != null ? (this.to - 32) * (5 / 9) : null
             );
         } else if (this.unit == 'celsius') {
             return new ImmutableTemperature(
@@ -123,16 +115,20 @@ class ImmutableTemperature extends ImmutableWeatherData {
                 this.unit,
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.from,
+                this.to
             );
         }
     };
 }
 
 class ImmutablePrecipitation extends ImmutableWeatherData {
-    constructor(_precipitation_type, _value, _unit, _type, _place, _time) {
+    constructor(_value, _unit, _type, _place, _time, _precipitation_type, _from, _to) {
         super(_value, _unit, _type, _place, _time);
         this.precipitation_type = _precipitation_type;
+        this.from = _from;
+        this.to = _to;
 
         // MAKE THIS CLASS IMMUTABLE
         if (new.target === ImmutablePrecipitation) {
@@ -142,15 +138,21 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
 
     getPrecipitationType() { return this.precipitation_type; }
 
+    getFrom() { return this.from; }
+
+    getTo() { return this.to; }
+
     convertToInches() {
         if (this.unit == 'MM') {
             return new ImmutablePrecipitation(
                 this.precipitation_type,
-                (this.value / 25.4),
+                this.value != null ? (this.value / 25.4) : null,
                 'IN',
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.from != null ? (this.from / 25.4) : null,
+                this.to != null ? (this.to / 25.4) : null
             );
         } else if (this.unit == 'IN') {
             return new ImmutablePrecipitation(
@@ -159,7 +161,9 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
                 this.unit,
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.from,
+                this.to
             );
         }
     };
@@ -168,11 +172,13 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
         if (this.unit == 'IN') {
             return new ImmutablePrecipitation(
                 this.precipitation_type,
-                (this.value * 0.0393701),
+                this.value != null ? (this.value * 0.0393701) : null,
                 'MM',
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.from != null ? (this.from * 0.0393701) : null,
+                this.to != null ? (this.to * 0.0393701) : null
             );
         } else if (this.unit == 'MM') {
             return new ImmutablePrecipitation(
@@ -181,15 +187,21 @@ class ImmutablePrecipitation extends ImmutableWeatherData {
                 this.unit,
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.from,
+                this.to
             );
         }
     };
 }
 
 class ImmutableWind extends ImmutableWeatherData {
-    constructor(_value, _unit, _type, _place, _time) {
+    constructor(_value, _unit, _type, _place, _time, _direction, _directions, _from, _to) {
         super(_value, _unit, _type, _place, _time);
+        this.direction = _direction;
+        this.directions = _directions;
+        this.from = _from;
+        this.to = _to;
 
         // MAKE THIS CLASS IMMUTABLE
         if (new.target === ImmutableWind) {
@@ -197,14 +209,25 @@ class ImmutableWind extends ImmutableWeatherData {
         }
     }
 
+    getFrom() { return this.from; }
+
+    getTo() { return this.to; }
+
+    getDirection() { return this.direction; }
+
+    getDirections() { return this.directions; }
+
     convertToMPH() {
         if (this.unit == 'MS') {
             return new ImmutableWind(
-                (this.value * 0.44704),
+                this.value != null ? (this.value * 0.44704) : null,
                 'MPH',
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.directions,
+                this.from != null ? (this.from * 0.44704) : null,
+                this.to != null ? (this.to * 0.44704) : null
             );
         } else if (this.unit == 'MPH') {
             return new ImmutableWind(
@@ -212,7 +235,10 @@ class ImmutableWind extends ImmutableWeatherData {
                 this.unit,
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.directions,
+                this.from,
+                this.to
             );
         }
     };
@@ -220,11 +246,14 @@ class ImmutableWind extends ImmutableWeatherData {
     convertToMS() {
         if (this.unit == 'MPH') {
             return new ImmutableWind(
-                (this.value / 2.23694),
+                this.value != null ? (this.value / 2.23694) : null,
                 'MS',
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.directions,
+                this.from != null ? (this.value / 2.23694) : null,
+                this.to != null ? (this.value / 2.23694) : null
             );
         } else if (this.unit == 'MS') {
             return new ImmutableWind(
@@ -232,15 +261,20 @@ class ImmutableWind extends ImmutableWeatherData {
                 this.unit,
                 this.type,
                 this.place,
-                this.time
+                this.time,
+                this.directions,
+                this.from,
+                this.to
             );
         }
     };
 }
 
 class ImmutableCloudCoverage extends ImmutableWeatherData {
-    constructor(_value, _unit, _type, _place, _time) {
+    constructor(_value, _unit, _type, _place, _time, _from, _to) {
         super(_value, _unit, _type, _place, _time);
+        this.from = _from;
+        this.to = _to;
 
         // MAKE THIS CLASS IMMUTABLE
         if (new.target === ImmutableCloudCoverage) {
@@ -248,10 +282,13 @@ class ImmutableCloudCoverage extends ImmutableWeatherData {
         }
     }
 
+    getFrom() { return this.from; }
+
+    getTo() { return this.to; }
+
     getCoverageType() { return this.type }
 }
 
-////////////////////// HELPER METHODS START ////////////////////////
 class MyDateInterval {
     constructor(_fromDate, _toDate) {
         this.fromDate = new Date(_fromDate);
@@ -280,7 +317,6 @@ class MyDateInterval {
 
     };
 }
-/////////////////////// HELPER METHODS END ////////////////////////
 
 angular.module('weatherApp', [])
     .factory('helperFunctionsFactory', [
@@ -299,15 +335,15 @@ angular.module('weatherApp', [])
             }
             helperFunctionsService.myMap = (a, f) => reduce(a, (arr, v) => [...arr, f(v)], []);
             helperFunctionsService.myFilter = (a, f) => reduce(a, (arr, v) => p(v) ? [...arr, p(v)] : arr, []);
-            helperFunctionsService.getId = () => {
-                var text = "";
-                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            // helperFunctionsService.getId = () => {
+            //     var text = "";
+            //     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-                for (var i = 0; i < 5; i++)
-                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+            //     for (var i = 0; i < 5; i++)
+            //         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-                return text;
-            }
+            //     return text;
+            // }
 
             //returning the service object
             return helperFunctionsService;
@@ -329,35 +365,63 @@ angular.module('weatherApp', [])
                         jsonData.unit,
                         jsonData.type,
                         jsonData.place,
-                        jsonData.time);
+                        jsonData.time,
+                        jsonData.direction,
+                        jsonData.directions,
+                        jsonData.from,
+                        jsonData.to);
                 else if (jsonData.type === 'cloud coverage')
                     temp = new ImmutableCloudCoverage(
                         jsonData.value,
                         jsonData.unit,
                         jsonData.type,
                         jsonData.place,
-                        jsonData.time);
+                        jsonData.time,
+                        jsonData.from,
+                        jsonData.to);
                 else if (jsonData.type === 'precipitation')
                     temp = new ImmutablePrecipitation(
-                        jsonData.precipitation_type,
                         jsonData.value,
                         jsonData.unit,
                         jsonData.type,
                         jsonData.place,
-                        jsonData.time);
+                        jsonData.time,
+                        jsonData.precipitation_types,
+                        jsonData.from,
+                        jsonData.to);
                 else if (jsonData.type === 'temperature')
                     temp = new ImmutableTemperature(
                         jsonData.value,
                         jsonData.unit,
                         jsonData.type,
                         jsonData.place,
-                        jsonData.time);
+                        jsonData.time,
+                        jsonData.from,
+                        jsonData.to);
                 else
                     $log.log('Received unknown weather "TYPE"...')
 
                 if (temp != null)
                     weatherHistoryArr.push(temp);
             }
+
+            weatherHistoryService.pushData = (jsonData) => {
+                $http({
+                    url: 'http://localhost:8080/data',
+                    method: 'POST',
+                    data: jsonData
+                })
+                    .then(
+                        // SUCCESS
+                        function () {
+                            $log.log('URL POST request successful for: ' + url)
+                        },
+                        // FAILURE
+                        function () {
+                            $log.log('URL POST request failed for: ' + url)
+                        })
+            }
+
             //DONE
             weatherHistoryService.getAll = (weatherHistoryListView) => {
                 $http({
@@ -410,12 +474,6 @@ angular.module('weatherApp', [])
                     method: 'GET'
                 })
                     .then(
-                        // SUCCESS
-                        //// anything involving '=' should use the '+' prefix
-                        // // it will then compare the dates' millisecond values
-                        // +x <= +y;  => true
-                        // +x >= +y;  => true
-                        // +x === +y; => true
                         function (response) {
                             let objList = response.data;
                             objList.forEach(function (item) {
@@ -622,6 +680,7 @@ angular.module('weatherApp', [])
             $log.log('Instantiating "weatherForecastFactory"...');
             let weatherForecastService = {};
 
+            // DONE
             updateWeatherForecast = (jsonData, weatherForecastArr) => {
                 // accessing the ng-model name and age and pushing them into the current list
                 let temp = null;
@@ -632,36 +691,46 @@ angular.module('weatherApp', [])
                         jsonData.unit,
                         jsonData.type,
                         jsonData.place,
-                        jsonData.time);
+                        jsonData.time,
+                        jsonData.direction,
+                        jsonData.directions,
+                        jsonData.from,
+                        jsonData.to);
                 else if (jsonData.type === 'cloud coverage')
                     temp = new ImmutableCloudCoverage(
                         jsonData.value,
                         jsonData.unit,
                         jsonData.type,
                         jsonData.place,
-                        jsonData.time);
+                        jsonData.time,
+                        jsonData.from,
+                        jsonData.to);
                 else if (jsonData.type === 'precipitation')
                     temp = new ImmutablePrecipitation(
-                        jsonData.precipitation_type,
                         jsonData.value,
                         jsonData.unit,
                         jsonData.type,
                         jsonData.place,
-                        jsonData.time);
+                        jsonData.time,
+                        jsonData.precipitation_types,
+                        jsonData.from,
+                        jsonData.to);
                 else if (jsonData.type === 'temperature')
                     temp = new ImmutableTemperature(
                         jsonData.value,
                         jsonData.unit,
                         jsonData.type,
                         jsonData.place,
-                        jsonData.time);
+                        jsonData.time,
+                        jsonData.from,
+                        jsonData.to);
                 else
                     $log.log('Received unknown weather "TYPE"...')
 
                 if (temp != null)
                     weatherForecastArr.push(temp);
             }
-
+            // DONE
             weatherForecastService.getAll = (weatherForecastListView) => {
                 $http({
                     url: 'http://localhost:8080/forecast',
@@ -685,22 +754,47 @@ angular.module('weatherApp', [])
                 //const filterData = this.weatherPrediction.filter(prediction => )
                 //use filter to find a single weatherPrediction within the weatherForecast array
             }
-
-            //return the forecast per these defined places, types and/or periods
-            weatherForecastService.forPlace = (place) => // works
-            {
-                const filteredPlaces = this.weatherPrediction.filter(prediction => prediction.place == place)
-                return filteredPlaces
+            // DONE
+            weatherForecastService.forPlace = (place, weatherForecastListView) => {
+                $http({
+                    url: 'http://localhost:8080/forecast/' + place,
+                    method: 'GET'
+                })
+                    .then(
+                        // SUCCESS
+                        function (response) {
+                            let objList = response.data;
+                            objList.forEach(function (item) { this.updateWeatherForecast(item, weatherForecastListView); });
+                        },
+                        // FAILURE
+                        function (response) {
+                            $log.log('URL GET request failed for: ' + url + 'With response: ' + response)
+                        })
             }
+
             weatherForecastService.forType = (type) => {
                 const filteredTypes = this.weatherPrediction.filter(prediction => prediction.type == type)
                 return filteredTypes
             }
-            weatherForecastService.forPeriod = (periodStart, periodEnd) => {
-                // try using date interval contains 
-                const filteredPeriod = this.weatherPrediction.filter(prediction =>
-                    prediction.time >= periodStart && prediction.time <= periodEnd)
-                return filteredPeriod
+            // DONE
+            weatherForecastService.forPeriod = (myDateInterval, weatherForecastListView) => {
+                $http({
+                    url: 'http://localhost:8080/forecast',
+                    method: 'GET'
+                })
+                    .then(
+                        function (response) {
+                            let objList = response.data;
+                            objList.forEach(function (item) {
+                                if (new Date(item.time).getTime() >= myDateInterval.getFrom().getTime()
+                                    && new Date(item.time).getTime() <= myDateInterval.getTo().getTime())
+                                    this.updateWeatherForecast(item, weatherForecastListView);
+                            });
+                        },
+                        // FAILURE
+                        function () {
+                            $log.log('URL GET request failed for: ' + url)
+                        })
             }
 
             weatherForecastService.convertToUsUnits = () => {
@@ -720,6 +814,7 @@ angular.module('weatherApp', [])
                     return convertedArray
                 })
             }
+
             weatherForecastService.convertToMetricUnits = () => {
                 //use map to convert every unit of from and to into metric units
             }
@@ -731,6 +826,7 @@ angular.module('weatherApp', [])
                 const average = this.weatherPrediction.reduce(reduceFrom)
                 return average
             }
+
             weatherForecastService.averageToValue = () => {
                 //use reduce to gather all to values in the weatherForecast array and return the result
                 const reduceTo = (average, to, _, { length }) => average + to.toNum / length;
@@ -739,33 +835,15 @@ angular.module('weatherApp', [])
 
             return weatherForecastService;
         }])
-    /** NOTE: the passed in parameters are what the controlelr will try to instantiate */
+    /** NOTE: the passed in parameters to the controller will be instantiated */
     .controller('weatherController', [
         'weatherHistoryFactory', 'weatherForecastFactory',
         function (weatherHistoryFactory, weatherForecastFactory) {
             let weatherCtrl = this;                      // this refers to the controller itself, so we no longer need $scope
             weatherCtrl.whFactory = weatherHistoryFactory;   // this helps ensure that the service acts withing "this" scope
             weatherCtrl.wfFactory = weatherForecastFactory;
-            // TODO: this has to be replaced with real database call to database
-            weatherCtrl.historyList = [
-                new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 1)),
-                new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 2)),
-                new ImmutablePrecipitation(precipitation_type = "SLEET", value = 10, unit = 'MM', type = 'RAIN', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 3)),
-                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 4)),
-                new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 1, 1)),
-                new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 2, 2)),
-                new ImmutablePrecipitation(precipitation_type = "SNOW", value = 10, unit = 'MM', type = 'RAIN', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 3, 3)),
-                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 4, 4))];
-
-            weatherCtrl.forecastList = [
-                new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 1)),
-                new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 2)),
-                new ImmutablePrecipitation(precipitation_type = "SLEET", value = 10, unit = 'MM', type = 'RAIN', place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 3)),
-                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Horsens', time = new Date(1990, 02, 23, 3, 30, 0, 4)),
-                new ImmutableWind(value = 30, unit = 'MS', type = 'N', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 1, 1)),
-                new ImmutableCloudCoverage(value = 33, unit = '%', type = 'CLEAR', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 2, 2)),
-                new ImmutablePrecipitation(precipitation_type = "SNOW", value = 10, unit = 'MM', type = 'RAIN', place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 3, 3)),
-                new ImmutableTemperature(value = 20, unit = 'FAHRENHEIT', type = null, place = 'Vejle', time = new Date(1990, 02, 23, 3, 30, 4, 4))];
+            weatherCtrl.historyList = [];
+            weatherCtrl.forecastList = [];
 
             weatherCtrl.getAllWeatherHistory = () => {
                 weatherCtrl.historyList = [];
@@ -774,12 +852,12 @@ angular.module('weatherApp', [])
 
             weatherCtrl.getWeatherHistoryForPlace = () => {
                 weatherCtrl.historyList = [];
-                weatherCtrl.whFactory.forPlace(weatherCtrl.place, weatherCtrl.historyList);
+                weatherCtrl.whFactory.forPlace(weatherCtrl.placeHistory, weatherCtrl.historyList);
             }
 
             weatherCtrl.getWeatherHistoryDateInterval = () => {
                 weatherCtrl.historyList = [];
-                weatherCtrl.whFactory.forPeriod(new MyDateInterval(weatherCtrl.fromDate, weatherCtrl.toDate), weatherCtrl.list);
+                weatherCtrl.whFactory.forPeriod(new MyDateInterval(weatherCtrl.fromDateHistory, weatherCtrl.toDateHistory), weatherCtrl.historyList);
             }
 
             weatherCtrl.getAllWeatherForecast = () => {
@@ -789,12 +867,17 @@ angular.module('weatherApp', [])
 
             weatherCtrl.getWeatherForecastForPlace = () => {
                 weatherCtrl.forecastList = [];
-                weatherCtrl.wfFactory.forPlace(weatherCtrl.place, weatherCtrl.forecastList);
+                weatherCtrl.wfFactory.forPlace(weatherCtrl.placeForecast, weatherCtrl.forecastList);
             }
 
             weatherCtrl.getWeatherForecastDateInterval = () => {
                 weatherCtrl.forecastList = [];
-                weatherCtrl.wfFactory.forPeriod(new MyDateInterval(weatherCtrl.fromDate, weatherCtrl.toDate), weatherCtrl.list);
+                weatherCtrl.wfFactory.forPeriod(new MyDateInterval(weatherCtrl.fromDateForecast, weatherCtrl.toDateForecast), weatherCtrl.forecastList);
+            }
+
+            weatherCtrl.pushWeatherHistory = () => {
+                weatherCtrl.forecastList = [];
+                weatherCtrl.whFactory.pushData(/*View data converted to JSON or convert inside service*/);
             }
 
         }]);
@@ -810,9 +893,30 @@ angular.module('weatherApp', [])
 
 
 
+//////// IMPORTANT MODEL CONVENTIONS
+//////// WIND
+// Type: wind speed
+// Unit: MS MPH
+// Value:
+//////// Could Coverage
+// Type: cloud coverage
+// Unit: %
+// Value:
+//      0%  - 33 % = CLEAR
+//      34% - 66 % = PARTLY CLOUDY
+//      67% - 100% = CLOUDY
+//////// PRECIPITATION
+// Type: precipitation
+// Precipitation Type: RAIN SLEET HAIL SNOW
+// Unit: MM IN
+// Value: 
+//////// TEMPERATURE
+// Type: temperature
+// Unit: FAHRENHEIT CELSIUS
+// Value:
 
 
-
+// EXAMPLES OF SERVICE AND PROVIDERS //
     //     // .config(["myDateIntervalConfiguredServiceProvider", function () {
     //     // NOTE: the provider name should be <<serviceName>> + "Provider"
     //     // NOTE: the provider is executed during the "congif" stage
