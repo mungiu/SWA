@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <script src="https://unpkg.com/@reactivex/rxjs@6.6.3/dist/global/rxjs.umd.js"></script> -->
+    <script type="module">
+        import { fromEvent, of, interval } from 'https://dev.jspm.io/rxjs@6/_esm2015';
+        import { ajax } from 'https://dev.jspm.io/rxjs@6/_esm2015/ajax';
+        import { concatMap, mergeMap, catchError, tap, delay, repeat, map, takeUntil, filter, startWith, flatMap } from 'https://dev.jspm.io/rxjs@6/_esm2015/operators';
+
+        const textField = document.querySelector('input')
+        const date = document.getElementById("date")
+        const ul = document.querySelector('ul')
+        const listItems = ul.getElementsByTagName('li');
+        const subscribeToggle = document.getElementById('subscribeToggle')
+        var severity = 0;
+        var accumulatedWarningsArray = [];
+
+
+        const addBullet = text => {
+            const li = document.createElement('li')
+            li.innerText = text
+            ul.appendChild(li)
+        }
+
+        const isANewID = (id) => {
+            for (let i = 0; i <= accumulatedWarningsArray.length - 1; i++) {
+                if (accumulatedWarningsArray[i].id == id)
+                    return false;
+            }
+            return true;
+        }
+
+        //writing displaying data in console and html
+        const write = response => {
+            if (response) {
+                // ul.innerHTML = "";
+                // check by id
+                response.warnings.forEach(warning => {
+                    if (isANewID(warning.id) && warning.severity >= textField.value) {
+                        accumulatedWarningsArray.push(warning)
+                        console.log(`RESPONSE IS Id: ${JSON.stringify(warning)}`)
+                        addBullet(JSON.stringify(warning))
+                    }
+                });
+            }
+        };
+
+        const clearWarningList = response => {
+            if (response) {
+                ul.innerHTML = "";
+                accumulatedWarningsArray = [];
+            }
+        }
+
+        const poll_url = url => interval(2000)
+            .pipe(concatMap(() => ajax.getJSON(url)))
+
+        const httpRequest = () => poll_url("http://localhost:8080/warnings/since/" + date.value);
+        // for educational purpose
+        // .pipe(rxjs.operators.delay(1000));
+
+        // of - Emits variable amount of values in a sequence and then emits a complete notification.
+        // const poll = of({}).pipe(
+        //     mergeMap(_ => httpRequest()
+        //         .pipe(catchError(e => { console.error(e); return of(false) }))),
+        //     tap(write),             // tap - Transparently perform actions or side-effects, such as logging
+        //     tap(_ => console.info('---waiting 3 secs to restart polling')),
+        //     delay(3000),
+        //     tap(_ => console.info('---restarted polling')),
+        //     repeat()                // repeat - Repeats an observable on completion
+        // )
+
+        // const weatherSubscription = poll.subscribe();
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        var mainStream = of({}).pipe(
+            mergeMap(_ => httpRequest()
+                .pipe(catchError(e => { console.error(e); return of(false) }))),
+            // tap(write),             // tap - Transparently perform actions or side-effects, such as logging
+            tap(_ => console.info('---waiting 3 secs to restart polling')),
+            delay(3000),
+            tap(_ => console.info('---restarted polling')),
+            // repeat()                // repeat - Repeats an observable on completion
+        );
+
+        var toggleStream = fromEvent(subscribeToggle, 'change')
+            .pipe(
+                map(e => e.target.checked),
+                tap(clearWarningList)
+            )
+
+        var resultStream = toggleStream
+            .pipe(
+                filter(x => x === true),
+                startWith(true),
+                flatMap(() => mainStream
+                    .pipe(takeUntil(toggleStream))))
+
+        resultStream.subscribe(x => write(x));
+
+        window.load = () => {
+        }
+    </script>
+</head>
+
+<body onload="load()">
+    Input lowest severity level of interest
+    <input value="0">
+    <br>
+    Choose warnings start date
+    <input id="date" type="date" value="1900-01-01">
+    <p></p>
+    <ul></ul>
+    Tick to subscribe, untick to unsubscribe
+    <input id="subscribeToggle" type="checkbox" checked>
+    <!-- <script src="index.js"></script> -->
+
+</body>
+
+</html>
