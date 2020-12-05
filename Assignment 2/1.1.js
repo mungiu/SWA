@@ -102,8 +102,8 @@ console.log()
 console.log('TEST IMMUTABLE WEATHER DATA');
 console.log('Data Must Change');
 console.log(myWeatherData.toString());
-var secondData = myWeatherData.setUnit('UNIT_CHANGED');
-var thirdData = secondData.setType('TYPE_CHANGED');
+secondData = myWeatherData.setUnit('UNIT_CHANGED');
+thirdData = secondData.setType('TYPE_CHANGED');
 console.log(thirdData.toString());
 console.log('Data Must Remain The Same');
 console.log(myWeatherData.toString());
