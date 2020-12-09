@@ -18,6 +18,44 @@
 // Unit: FAHRENHEIT CELSIUS
 // Value:
 
+////////////////////// HELPER METHODS START ////////////////////////
+class MyDateInterval {
+    constructor(_fromDate, _toDate) {
+        this.fromDate = new Date(_fromDate);
+        this.toDate = new Date(_toDate);
+
+        // MAKE THIS CLASS IMMUTABLE
+        if (new.target === ImmutableDataType) {
+            Object.freeze(this)
+        }
+    }
+
+    getFrom() { return this.fromDate }
+    setPlace(newFromDate) { return new MyDateInterval(newFromDate, this.toDate) }
+
+    getTo() { return this.to }
+    setPlace(newToDate) { return new MyDateInterval(this.fromDate, newToDate) }
+
+    contains(cDate) {
+        const cDate2 = new Date(cDate);
+        return (cDate2 >= this.fromDate && cDate2 <= this.toDate);
+    }
+}
+
+const reduce = function (iterable, reduceFn, accumulator) {
+    for (let i of iterable) {
+        accumulator = reduceFn(accumulator, i)
+    }
+    return accumulator
+}
+
+const myMap = (a, f) => reduce(a, (arr, v) => [...arr, f(v)], [])
+const myFilter = (a, p) => reduce(a, (arr, v) => p(v) ? [...arr, p(v)] : arr, [])
+
+/////////////////////// HELPER METHODS END ////////////////////////
+
+
+
 class ImmutableEvent {
     constructor(_place, _time) {
         this.place = _place;
@@ -139,7 +177,7 @@ class ImmutableTemperature extends ImmutableWeatherData {
                 this.time
             );
         }
-    };
+    }
 
     // (32°F − 32) × 5/9 = 0°C
     convertToC() {
@@ -160,22 +198,22 @@ class ImmutableTemperature extends ImmutableWeatherData {
                 this.time
             );
         }
-    };
+    }
 }
 var myTemperature = new ImmutableTemperature(1, 'testUnit', 'testType', 'testPlace', null);
 console.log()
 console.log('TEST IMMUTABLE TEMPERATURE');
 console.log('Data Must Change');
 console.log(myTemperature.toString());
-var secondData = myTemperature.setUnit('UNIT_CHANGED');
-var thirdData = secondData.setType('TYPE_CHANGED');
+secondData = myTemperature.setUnit('UNIT_CHANGED');
+thirdData = secondData.setType('TYPE_CHANGED');
 console.log(thirdData.toString());
 console.log('Data Must Remain The Same');
 console.log(myTemperature.toString());
 myTemperature.type = "MANUALLY FORCED TYPE";
 console.log(myTemperature.toString());
 
-class ImmutablePrecipitation extends ImmutableDataType {
+class ImmutablePrecipitation extends ImmutableWeatherData {
     constructor(_value, _unit, _type, _place, _time) {
         super(_value, _unit, _type, _place, _time);
 
@@ -203,7 +241,7 @@ class ImmutablePrecipitation extends ImmutableDataType {
                 this.time
             );
         }
-    };
+    }
 
     convertToMM() {
         if (this.unit == 'IN') {
@@ -223,22 +261,22 @@ class ImmutablePrecipitation extends ImmutableDataType {
                 this.time
             );
         }
-    };
+    }
 }
 var myPrecipitation = new ImmutablePrecipitation(1, 'testUnit', 'testType', 'testPlace', null);
 console.log()
 console.log('TEST IMMUTABLE PRECIPITATION');
 console.log('Data Must Change');
 console.log(myPrecipitation.toString());
-var secondData = myPrecipitation.setUnit('UNIT_CHANGED');
-var thirdData = secondData.setType('TYPE_CHANGED');
+secondData = myPrecipitation.setUnit('UNIT_CHANGED');
+thirdData = secondData.setType('TYPE_CHANGED');
 console.log(thirdData.toString());
 console.log('Data Must Remain The Same');
 console.log(myPrecipitation.toString());
 myPrecipitation.type = "MANUALLY FORCED TYPE";
 console.log(myPrecipitation.toString());
 
-class ImmutableWind extends ImmutableDataType {
+class ImmutableWind extends ImmutableWeatherData {
     constructor(_value, _unit, _type, _place, _time) {
         super(_value, _unit, _type, _place, _time);
 
@@ -266,7 +304,7 @@ class ImmutableWind extends ImmutableDataType {
                 this.time
             );
         }
-    };
+    }
 
     convertToMS() {
         if (this.unit == 'MPH') {
@@ -286,22 +324,22 @@ class ImmutableWind extends ImmutableDataType {
                 this.time
             );
         }
-    };
+    }
 }
 var myWind = new ImmutableWind(1, 'testUnit', 'testType', 'testPlace', null);
 console.log()
 console.log('TEST IMMUTABLE WIND');
 console.log('Data Must Change');
 console.log(myWind.toString());
-var secondData = myWind.setUnit('UNIT_CHANGED');
-var thirdData = secondData.setType('TYPE_CHANGED');
+secondData = myWind.setUnit('UNIT_CHANGED');
+thirdData = secondData.setType('TYPE_CHANGED');
 console.log(thirdData.toString());
 console.log('Data Must Remain The Same');
 console.log(myWind.toString());
 myWind.type = "MANUALLY FORCED TYPE";
 console.log(myWind.toString());
 
-class ImmutableCloudCoverage extends ImmutableDataType {
+class ImmutableCloudCoverage extends ImmutableWeatherData {
     constructor(_value, _unit, _type, _place, _time) {
         super(_value, _unit, _type, _place, _time);
 
@@ -318,15 +356,15 @@ console.log()
 console.log('TEST IMMUTABLE CLOUDCOVERAGE');
 console.log('Data Must Change');
 console.log(myCloudCoverage.toString());
-var secondData = myCloudCoverage.setUnit('UNIT_CHANGED');
-var thirdData = secondData.setType('TYPE_CHANGED');
+secondData = myCloudCoverage.setUnit('UNIT_CHANGED');
+thirdData = secondData.setType('TYPE_CHANGED');
 console.log(thirdData.toString());
 console.log('Data Must Remain The Same');
 console.log(myCloudCoverage.toString());
 myCloudCoverage.type = "MANUALLY FORCED TYPE";
 console.log(myCloudCoverage.toString());
 
-class ImmutableWeatherHistory extends ImmutableDataType {
+class ImmutableWeatherHistory {
     constructor(..._immutableWeatherDataArr) {
         this.immutableWeatherDataArr = _immutableWeatherDataArr;
 
@@ -393,8 +431,8 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             myMap(this.immutableWeatherDataArr, (w) => {
                 if (w.type == 'MS' || w.type == 'MPH')
                     w.convertToMPH();
-                else if (w.type == '%')
-                    w
+                // else if (w.type == '%')
+                //     w
                 else if (w.type == 'MM' || w.type == 'IN')
                     w.convertToInches();
                 else if (w.type == 'CELSIUS' || w.type == 'FAHRENHEIT')
@@ -408,8 +446,8 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             myMap(this.immutableWeatherDataArr, (w) => {
                 if (w.type == 'MS' || w.type == 'MPH')
                     w.convertToMS();
-                else if (w.type == '%')
-                    w
+                // else if (w.type == '%')
+                //     w
                 else if (w.type == 'MM' || w.type == 'IN')
                     w.convertToMM();
                 else if (w.type == 'CELSIUS' || w.type == 'FAHRENHEIT')
@@ -425,9 +463,7 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             w.unit == "MS" || w.unit == "MPH")
             ? w : null
         ).forEach(filteredElement => {
-            if (typeof min == 'undefined')
-                min = filteredElement.value;
-            else if (filteredElement.value <= min)
+            if (typeof min == 'undefined' || filteredElement.value <= min)
                 min = filteredElement.value;
         })
 
@@ -441,9 +477,7 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             w.unit == "MM" || w.unit == "IN")
             ? w : null
         ).forEach(filteredElement => {
-            if (typeof min == 'undefined')
-                min = filteredElement.value;
-            else if (filteredElement.value <= min)
+            if (typeof min == 'undefined' || filteredElement.value <= min)
                 min = filteredElement.value;
         })
 
@@ -457,9 +491,7 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             w.unit == "FAHRENHEIT" || w.unit == "CELSIUS")
             ? w : null
         ).forEach(filteredElement => {
-            if (typeof min == 'undefined')
-                min = filteredElement.value;
-            else if (filteredElement.value <= min)
+            if (typeof min == 'undefined' || filteredElement.value <= min)
                 min = filteredElement.value;
         })
 
@@ -473,9 +505,7 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             w.unit == "\%")
             ? w : null
         ).forEach(filteredElement => {
-            if (typeof min == 'undefined')
-                min = filteredElement.value;
-            else if (filteredElement.value <= min)
+            if (typeof min == 'undefined' || filteredElement.value <= min)
                 min = filteredElement.value;
         })
 
@@ -489,9 +519,7 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             w.unit == "MS" || w.unit == "MPH")
             ? w : null
         ).forEach(filteredElement => {
-            if (typeof windData == 'undefined')
-                windData = filteredElement;
-            else if (filteredElement.getTime() < windData.getTime())
+            if (typeof windData == 'undefined' || filteredElement.getTime() < windData.getTime())
                 windData = filteredElement;
         })
 
@@ -505,9 +533,7 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             w.unit == "MM" || w.unit == "IN")
             ? w : null
         ).forEach(filteredElement => {
-            if (typeof precipitationData == 'undefined')
-                precipitationData = filteredElement;
-            else if (filteredElement.getTime() < precipitationData.getTime())
+            if (typeof precipitationData == 'undefined' || filteredElement.getTime() < precipitationData.getTime())
                 precipitationData = filteredElement;
         })
 
@@ -521,9 +547,7 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             w.unit == "FAHRENHEIT" || w.unit == "CELSIUS")
             ? w : null
         ).forEach(filteredElement => {
-            if (typeof temperatureData == 'undefined')
-                temperatureData = filteredElement;
-            else if (filteredElement.getTime() < temperatureData.getTime())
+            if (typeof temperatureData == 'undefined' || filteredElement.getTime() < temperatureData.getTime())
                 temperatureData = filteredElement;
         })
 
@@ -538,13 +562,11 @@ class ImmutableWeatherHistory extends ImmutableDataType {
             w.unit == "\%")
             ? w : null
         )
-        // CALLING FOR EACH ON THE FILTERED ARRAY
-        .forEach(filteredElement => {
-            if (typeof cloudCoverageData == 'undefined')
-                cloudCoverageData = filteredElement;
-            else if (filteredElement.getTime() < cloudCoverageData.getTime())
-                cloudCoverageData = filteredElement;
-        })
+            // CALLING FOR EACH ON THE FILTERED ARRAY
+            .forEach(filteredElement => {
+                if (typeof cloudCoverageData == 'undefined' || filteredElement.getTime() < cloudCoverageData.getTime())
+                    cloudCoverageData = filteredElement;
+            })
 
         return cloudCoverageData;
     }
@@ -560,51 +582,10 @@ console.log()
 console.log('TEST IMMUTABLE CLOUDCOVERAGE');
 console.log('Data Must Change');
 console.log(myCloudCoverage.toString());
-var secondData = myWeatherHistory.convertToInternationalUnits();
+secondData = myWeatherHistory.convertToInternationalUnits();
 // TO DO CONTINUE
 console.log(thirdData.toString());
 console.log('Data Must Remain The Same');
 console.log(myCloudCoverage.toString());
 myCloudCoverage.type = "MANUALLY FORCED TYPE";
 console.log(myCloudCoverage.toString());
-
-////////////////////// HELPER METHODS START ////////////////////////
-class MyDateInterval {
-    constructor(_fromDate, _toDate) {
-        this.fromDate = new Date(_fromDate);
-        this.toDate = new Date(_toDate);
-
-        // MAKE THIS CLASS IMMUTABLE
-        if (new.target === ImmutableDataType) {
-            Object.freeze(this)
-        }
-    }
-
-    getFrom() { return this.fromDate };
-    setPlace(newFromDate) { return new MyDateInterval(newFromDate, this.toDate) };
-
-    getTo() { return this.to };
-    setPlace(newToDate) { return new MyDateInterval(this.fromDate, newToDate) };
-
-    contains(cDate) {
-        const cDate2 = new Date(cDate);
-        if (cDate2 >= this.fromDate && cDate2 <= this.toDate) {
-            return true;
-        }
-        else {
-            return false;
-        }
-
-    };
-}
-
-const reduce = function (iterable, reduceFn, accumulator) {
-    for (let i of iterable) {
-        accumulator = reduceFn(accumulator, i)
-    }
-    return accumulator
-}
-
-const myMap = (a, f) => reduce(a, (arr, v) => [...arr, f(v)], [])
-const myFilter = (a, p) => reduce(a, (arr, v) => p(v) ? [...arr, p(v)] : arr, [])
-/////////////////////// HELPER METHODS END ////////////////////////
